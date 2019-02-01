@@ -8,6 +8,7 @@ const db = monk('localhost/twitter');
 const app = express();
 
 const tweets = db.get('tweets');
+const users = db.get('users');
 
 const limiter = rateLimit({
     windowMS: 30*1000,
@@ -26,9 +27,87 @@ app.get('/', (req, res) => {
 })
 
 function isValid(tweet) {
-    return tweet.name && tweet.name.toString().trim() != '' 
-    && tweet.tweet && tweet.tweet.toString().trim() != ''
+    return tweet.name && tweet.name.toString().trim() != '' && tweet.name.trim().length <= 30
+    && tweet.tweet && tweet.tweet.toString().trim() != '' && tweet.tweet.trim().length <= 140
 }
+
+function userExist(user) {
+   return users
+        .findOne({name: user.toString()}, 'name')
+        .then(result => {
+            if(result != null) {
+                return true;
+            } else {
+                return false;
+            }
+        })
+}
+
+
+app.post('/signup', (req, res) => {
+    let newUser = {
+        name: req.body.username,
+        password: req.body.password
+    }
+
+    userExist(newUser.name)
+        .then(exists => {
+            if(!exists) {
+                users
+                    .insert(newUser)
+                    .then(info => {
+                        res.json({
+                            status: true,
+                            message: 'Username created',
+                            info  
+                        })
+                    })
+            } else {
+                res.json({
+                    status: false,
+                    message: 'This username is already taken'
+                })
+            }
+    })
+});
+
+
+function findUser(user, pass) {
+    return users
+               .findOne({name:user, password: pass}, { fields: { name: 1, password: 1 } })
+               .then(result => {
+                   if(result != null) {
+                    return true;
+                   } else {
+                       return false;
+                   }
+               })
+}
+
+app.post('/login', (req, res) => {
+    let userLogin = {
+        name: req.body.name.toString(),
+        password: req.body.password.toString()
+    }
+
+    findUser(userLogin.name, userLogin.password)
+        .then(result => {
+            console.log(result)
+            if(result) {
+                res.json({
+                    status: true,
+                    message: 'You are logged in'
+                })
+            } else {
+                res.json({
+                    status: false,
+                    message: 'Username or password invalid'
+                })
+            }
+        })
+
+})
+
 
 app.get('/tweets', (req, res) => {
     tweets

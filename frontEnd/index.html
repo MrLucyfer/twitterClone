@@ -1,27 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>NEW TWITTER</title>
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<title>Say Something</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 	<link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/litera/bootstrap.min.css">
 </head>
 <body>
 	<div id="app">
 		<div id="header">
 			<h1 class="text-center mb-5">{{message}}</h1>
+		<p class="text-right"> Made with 💚 by MrMischief</p>
 		</div>
 		<form class="text-center">
 			<label>NAME</label>
 			<input class="form-control col-md-4 container" v-model="name">
 			<br>
 			<label>SOMETHING</label>
-			<textarea class="form-control col-md-4 container" v-model="tweet" cols="10" rows="4"></textarea>
+			<textarea class="form-control col-md-4 container" v-model="tweet" cols="10" rows="4" maxlength="140"></textarea>
 			<br>
 			<button type="submit" @click.prevent="sendData()" class="btn btn-primary mb-5">SAY!</button>
 		</form>
 		<div id="tweets">
 			<div v-for="tweet in history">
-				<div class="card container col-md-4 mb-5">
+				<div class="card border-primary container mb-3" style="max-width: 20rem;">
 					<div class="card-body">
 						<h2 class="text-center">{{tweet.name}}</h2>
 						<p class="text-center">{{tweet.tweet}}</p>
@@ -31,6 +32,6 @@
 			</div>	
 		</div>
 	</div>
-	<script src="app.js"></script>
+	<script src="main.js"></script>
 </body>
 </html>
